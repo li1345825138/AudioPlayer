@@ -4,7 +4,7 @@ import java.awt.Toolkit;
 
 /**
  * Music Gui
- * @author SaltFish
+ * @author li1345825138
  * @date 09/12/2022
  */
 public class AudioPlayerGUI extends JFrame {

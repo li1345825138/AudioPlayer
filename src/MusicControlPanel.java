@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * Music Control Panel
- * @author SaltFish
+ * @author li1345825138
  * @date 09/12/2022
  */
 public class MusicControlPanel extends JPanel implements ActionListener, KeyListener {
