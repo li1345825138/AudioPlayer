@@ -158,7 +158,7 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
     private void moniteMusicThread() {
         while (this.musicThread.isPlaying() || this.musicThread.isPause()){
             try {
-                Thread.sleep(500);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -168,6 +168,7 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
         this.musicList.setEnabled(true);
         this.stopMusicBtn.setEnabled(false);
         this.playPauseMusicBtn.setText("Play");
+        this.loopCheckBox.setSelected(false);
         this.loopCheckBox.setEnabled(false);
     }
 
