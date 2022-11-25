@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -87,7 +88,7 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
             return null;
         }
         String[] musicNames = musicFiles.list((dir, name) -> name.endsWith(".wav"));
-        for (int i = 0; i < musicNames.length; i++)
+        for (int i = 0; i < Objects.requireNonNull(musicNames).length; i++)
             musicNames[i] = musicNames[i].replace(".wav", "");
         return musicNames;
     }
@@ -98,6 +99,7 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
     private void setUpComponents () {
         // Set up Music List Panel
         String[] musicListNames = getMusicList();
+        assert musicListNames != null;
         if (musicListNames.length == 0) {
             JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
         }
@@ -165,8 +167,9 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "Play":
-                if (this.selectMusicTitle.getText() == null || this.selectMusicTitle.getText().isEmpty() || this.selectMusicTitle.getText().equals("<== Select Music From Left Side First")) return;
+            case "Play" -> {
+                if (this.selectMusicTitle.getText() == null || this.selectMusicTitle.getText().isEmpty() || this.selectMusicTitle.getText().equals("<== Select Music From Left Side First"))
+                    return;
                 if (this.isPause) {
                     this.musicThread.setRepeat(this.loopCheckBox.isSelected());
                     this.musicThreadPool.execute(this.musicThread);
@@ -181,37 +184,32 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
                 this.stopMusicBtn.setEnabled(true);
                 this.musicThread = new AudioStreamThread(this.musicPath, this.selectMusicTitle.getText());
                 this.musicThreadPool.execute(this.musicThread);
-                while (!this.musicThread.isPlaying());
-                this.musicThreadPool.execute(() -> moniteMusicThread());
+                while (!this.musicThread.isPlaying()) ;
+                this.musicThreadPool.execute(this::moniteMusicThread);
                 this.loopCheckBox.setEnabled(true);
-                break;
-            case "Pause":
+            }
+            case "Pause" -> {
                 if (this.musicThread == null) return;
                 this.musicThread.pauseAudioStream();
                 this.loopCheckBox.setEnabled(false);
                 this.playPauseMusicBtn.setText("Play");
                 this.isPause = true;
-                break;
-            case "Stop":
+            }
+            case "Stop" -> {
                 this.musicThread.stopMusic();
-                this.loopCheckBox.setSelected(false);
-                this.refreshMusicListBtn.setEnabled(true);
-                this.stopMusicBtn.setEnabled(false);
-                this.musicList.setEnabled(true);
-                this.playPauseMusicBtn.setText("Play");
                 this.isPause = false;
-                break;
-            case "Repeat":
-                this.musicThread.setRepeat(this.loopCheckBox.isSelected());
-                break;
-            case "Refresh Music List":
+            }
+            case "Repeat" -> this.musicThread.setRepeat(this.loopCheckBox.isSelected());
+            case "Refresh Music List" -> {
                 this.defaultModule.removeAllElements();
                 String[] musicListNames = getMusicList();
+                assert musicListNames != null;
                 if (musicListNames.length == 0) {
                     JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
                 this.defaultModule.addAll(List.of(musicListNames));
                 this.selectMusicTitle.setText("<== Select Music From Left Side First");
+            }
         }
     }
 }
