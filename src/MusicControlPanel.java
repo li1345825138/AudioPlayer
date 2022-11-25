@@ -20,6 +20,7 @@ import java.util.List;
  * @author li1345825138
  * @date 09/12/2022
  */
+@Deprecated(since = "This is Old Music Control Panel, use MusicControlPanelV2 instead")
 public class MusicControlPanel extends JPanel implements ActionListener, KeyListener {
 
     // Default Module set up for JList

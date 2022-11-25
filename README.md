@@ -21,5 +21,6 @@ ___
  * Make music could resume at pause position (√)
  * Implement Music Loop (√)
  * Refresh Music Play List (√)
- * Implement Key(KEYPAD 0 or number 0) to Play or Pause Music when Audio Window is on focus (√)
+ * Use Thread Pool to re-implement MusicControlPanel (√)
+ * ~~Implement Key(KEYPAD 0 or number 0) to Play or Pause Music when Audio Window is on focus~~
  * More Feature(maybe)...

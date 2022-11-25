@@ -12,12 +12,14 @@ public class AudioPlayerGUI extends JFrame {
     // Music Control Panel
     private MusicControlPanel musicControlPanel;
 
+    private MusicControlPanelV2 musicControlPanelV2;
+
     /**
      * Set up Control Panel Object
      */
     private void setUpControlPanel() {
-        this.musicControlPanel = new MusicControlPanel("songs/");
-        this.add(this.musicControlPanel);
+        this.musicControlPanelV2 = new MusicControlPanelV2("songs/");
+        this.add(this.musicControlPanelV2);
     }
     /**
      * Constructor
@@ -36,28 +38,11 @@ public class AudioPlayerGUI extends JFrame {
     }
 
     /**
-     * Test code only
-     */
-    /*public AudioPlayerGUI() {
-        try {
-            URL musicPath = new URL("jar:file:!/res/");
-            File musicFiles = new File(musicPath.getPath());
-            String[] musicNames = musicFiles.list((dir, name) -> name.endsWith(".wav"));
-            for (int i = 0; i < musicNames.length; i++)
-                musicNames[i] = musicNames[i].replace(".wav", "");
-            System.out.println(musicNames);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
-
-    /**
      * Program Main Entry
      * @param args
      */
     public static void main(String[] args) {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         new AudioPlayerGUI(screenSize);
-        /*new AudioPlayerGUI();*/
     }
 }

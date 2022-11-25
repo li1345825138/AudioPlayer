@@ -11,6 +11,7 @@ import java.io.IOException;
  * @author li1345825138
  * @date 09/12/2022
  */
+@Deprecated(since = "This is old Music Thread, use AudioStreamThread instead")
 public class PlayMusicRunable implements Runnable {
 
     /**
