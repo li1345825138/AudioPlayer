@@ -68,12 +68,13 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
      */
     public MusicControlPanelV2(String musicsPath) {
         setLayout(null);
-        this.musicThreadPool = new ThreadPoolExecutor(2, 2, 5, TimeUnit.MILLISECONDS,
+        this.musicThreadPool = new ThreadPoolExecutor(2, 2, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(1), Executors.defaultThreadFactory(),
                 new ThreadPoolExecutor.DiscardPolicy());
         this.musicPath = musicsPath;
         this.isPause = false;
         setUpComponents();
+        this.musicThread = new AudioStreamThread();
     }
 
     /**
@@ -155,7 +156,13 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
      * Monite music thread to see if it ended
      */
     private void moniteMusicThread() {
-        while (this.musicThread.isPlaying() || this.musicThread.isPause());
+        while (this.musicThread.isPlaying() || this.musicThread.isPause()){
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         this.isPause = false;
         this.refreshMusicListBtn.setEnabled(true);
         this.musicList.setEnabled(true);
@@ -182,7 +189,7 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
                 this.musicList.setEnabled(false);
                 this.refreshMusicListBtn.setEnabled(false);
                 this.stopMusicBtn.setEnabled(true);
-                this.musicThread = new AudioStreamThread(this.musicPath, this.selectMusicTitle.getText());
+                this.musicThread.setMusicProperties(this.musicPath, this.selectMusicTitle.getText());
                 this.musicThreadPool.execute(this.musicThread);
                 while (!this.musicThread.isPlaying()) ;
                 this.musicThreadPool.execute(this::moniteMusicThread);

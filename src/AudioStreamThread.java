@@ -32,10 +32,39 @@ public class AudioStreamThread implements Runnable {
 
     /**
      * Play music Runnable Contractor
+     * This Constructor didn't set up anything
+     * Set up the properties before run it
+     */
+    public AudioStreamThread() {
+        this.status = MusicStatus.Stop;
+        this.musicFullPath = null;
+        this.audioInputStream = null;
+        this.clip = null;
+    }
+
+    /**
+     * Play music Runnable Contractor
      * @param musicPath music files locate root path
      * @param musicName music file name
      */
     public AudioStreamThread(String musicPath, String musicName){
+        StringBuilder sb = new StringBuilder(musicPath);
+        sb.append(musicName).append(".wav");
+        this.musicFullPath = sb.toString();
+        try {
+            initialAudioStream();
+        } catch (Exception e) {
+            System.err.println("Exception occur on initial the Audio Stream");
+            System.exit(-1);
+        }
+    }
+
+    /**
+     * Set up Music Audio properties
+     * @param musicPath music files locate root path
+     * @param musicName music file name
+     */
+    public void setMusicProperties(String musicPath, String musicName) {
         StringBuilder sb = new StringBuilder(musicPath);
         sb.append(musicName).append(".wav");
         this.musicFullPath = sb.toString();
@@ -136,7 +165,6 @@ public class AudioStreamThread implements Runnable {
         // Just for secure check
         if (this.audioInputStream == null || this.clip == null) return;
         this.clip.start();
-        while (!this.clip.isRunning()); // wait to start
         this.status = MusicStatus.Playing;
     }
 }
