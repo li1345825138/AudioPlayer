@@ -68,7 +68,7 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
      */
     public MusicControlPanelV2(String musicsPath) {
         setLayout(null);
-        this.musicThreadPool = new ThreadPoolExecutor(2, 2, 0L, TimeUnit.MILLISECONDS,
+        this.musicThreadPool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(1), Executors.defaultThreadFactory(),
                 new ThreadPoolExecutor.DiscardPolicy());
         this.musicPath = musicsPath;
