@@ -211,6 +211,7 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
                     JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
                 this.defaultModule.addAll(List.of(musicListNames));
+                this.selectMusicTitle.setText("<== Select Music From Left Side First");
         }
     }
 }

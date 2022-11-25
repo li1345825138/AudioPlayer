@@ -10,8 +10,6 @@ import java.awt.Toolkit;
 public class AudioPlayerGUI extends JFrame {
 
     // Music Control Panel
-    private MusicControlPanel musicControlPanel;
-
     private MusicControlPanelV2 musicControlPanelV2;
 
     /**
@@ -27,7 +25,7 @@ public class AudioPlayerGUI extends JFrame {
      */
     public AudioPlayerGUI(Dimension screenSize) {
         setTitle("Java Audio Player");
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(581, 330);
         int positionX = (screenSize.width - getWidth()) / 2;
         int positionY = (screenSize.height - getHeight()) / 2;
