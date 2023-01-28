@@ -74,6 +74,7 @@ public class MusicControlPanel extends JPanel implements ActionListener, KeyList
             return null;
         }
         String[] musicNames = musicFiles.list((dir, name) -> name.endsWith(".wav"));
+        if (musicNames == null) return null;
         for (int i = 0; i < musicNames.length; i++)
             musicNames[i] = musicNames[i].replace(".wav", "");
         return musicNames;
@@ -84,12 +85,13 @@ public class MusicControlPanel extends JPanel implements ActionListener, KeyList
      */
     private void setUpComponents () {
         // Set up Music List Panel
-        String[] musicListNames = getMusicList();
-        if (musicListNames.length == 0) {
-            JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
-        }
         this.defaultModule = new DefaultListModel<>();
-        this.defaultModule.addAll(List.of(musicListNames));
+        String[] musicListNames = getMusicList();
+        if (musicListNames == null || musicListNames.length == 0) {
+            JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else {
+            this.defaultModule.addAll(List.of(musicListNames));
+        }
         this.musicList = new JList<>(this.defaultModule);
         this.musicList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.musicList.setFocusable(false);
@@ -210,7 +212,7 @@ public class MusicControlPanel extends JPanel implements ActionListener, KeyList
             this.musicPlay = new PlayMusicRunable(this.musicPath, this.selectMusicTitle.getText());
             this.musicThread = new Thread(this.musicPlay);
             this.musicThread.start();
-            this.musicPlayingMonitor = new Thread(() -> this.stopPlayWhenFinished());
+            this.musicPlayingMonitor = new Thread(this::stopPlayWhenFinished);
             this.musicPlayingMonitor.start();
             this.loopCheckBox.setEnabled(true);
         } else if (command.equals("Pause")) {
@@ -241,10 +243,11 @@ public class MusicControlPanel extends JPanel implements ActionListener, KeyList
         } else if (e.getSource() == this.refreshMusicListBtn) {
             this.defaultModule.removeAllElements();
             String[] musicListNames = getMusicList();
-            if (musicListNames.length == 0) {
+            if (musicListNames == null || musicListNames.length == 0) {
                 JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
+            } else {
+                this.defaultModule.addAll(List.of(musicListNames));
             }
-            this.defaultModule.addAll(List.of(musicListNames));
         }
     }
 
@@ -264,15 +267,12 @@ public class MusicControlPanel extends JPanel implements ActionListener, KeyList
     @Override
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_0:
-            case KeyEvent.VK_NUMPAD0:
+            case KeyEvent.VK_0, KeyEvent.VK_NUMPAD0 -> {
                 if (this.playPauseMusicBtn.getText().equals("Play"))
                     playOrPauseMusic("Play");
                 else if (this.playPauseMusicBtn.getText().equals("Pause"))
                     playOrPauseMusic("Pause");
-                break;
-            default:
-                break;
+            }
         }
     }
 

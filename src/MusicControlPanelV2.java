@@ -1,18 +1,8 @@
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -89,7 +79,8 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
             return null;
         }
         String[] musicNames = musicFiles.list((dir, name) -> name.endsWith(".wav"));
-        for (int i = 0; i < Objects.requireNonNull(musicNames).length; i++)
+        if (musicNames == null) return null;
+        for (int i = 0; i < musicNames.length; i++)
             musicNames[i] = musicNames[i].replace(".wav", "");
         return musicNames;
     }
@@ -99,13 +90,13 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
      */
     private void setUpComponents () {
         // Set up Music List Panel
-        String[] musicListNames = getMusicList();
-        assert musicListNames != null;
-        if (musicListNames.length == 0) {
-            JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
-        }
         this.defaultModule = new DefaultListModel<>();
-        this.defaultModule.addAll(List.of(musicListNames));
+        String[] musicListNames = getMusicList();
+        if (musicListNames == null || musicListNames.length == 0) {
+            JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else {
+            this.defaultModule.addAll(List.of(musicListNames));
+        }
         this.musicList = new JList<>(this.defaultModule);
         this.musicList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.musicList.setFocusable(false);
@@ -192,7 +183,7 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
                 this.stopMusicBtn.setEnabled(true);
                 this.musicThread.setMusicProperties(this.musicPath, this.selectMusicTitle.getText());
                 this.musicThreadPool.execute(this.musicThread);
-                while (!this.musicThread.isPlaying()) ;
+                while (!this.musicThread.isPlaying());
                 this.musicThreadPool.execute(this::moniteMusicThread);
                 this.loopCheckBox.setEnabled(true);
             }
@@ -211,11 +202,11 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
             case "Refresh Music List" -> {
                 this.defaultModule.removeAllElements();
                 String[] musicListNames = getMusicList();
-                assert musicListNames != null;
-                if (musicListNames.length == 0) {
+                if (musicListNames == null || musicListNames.length == 0) {
                     JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    this.defaultModule.addAll(List.of(musicListNames));
                 }
-                this.defaultModule.addAll(List.of(musicListNames));
                 this.selectMusicTitle.setText("<== Select Music From Left Side First");
             }
         }
