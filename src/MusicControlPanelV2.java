@@ -143,26 +143,6 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
         this.setFocusable(true);
     }
 
-    /**
-     * Monite music thread to see if it ended
-     */
-    private void moniteMusicThread() {
-        while (this.musicThread.isPlaying() || this.musicThread.isPause()){
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        this.isPause = false;
-        this.refreshMusicListBtn.setEnabled(true);
-        this.musicList.setEnabled(true);
-        this.stopMusicBtn.setEnabled(false);
-        this.playPauseMusicBtn.setText("Play");
-        this.loopCheckBox.setSelected(false);
-        this.loopCheckBox.setEnabled(false);
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -184,7 +164,7 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
                 this.musicThread.setMusicProperties(this.musicPath, this.selectMusicTitle.getText());
                 this.musicThreadPool.execute(this.musicThread);
                 while (!this.musicThread.isPlaying());
-                this.musicThreadPool.execute(this::moniteMusicThread);
+                this.musicThreadPool.execute(new MusicThreadMonitorThread(this.musicThread, this));
                 this.loopCheckBox.setEnabled(true);
             }
             case "Pause" -> {
@@ -210,5 +190,29 @@ public class MusicControlPanelV2 extends JPanel implements ActionListener {
                 this.selectMusicTitle.setText("<== Select Music From Left Side First");
             }
         }
+    }
+
+    public JList<String> getMusicListComp() {
+        return this.musicList;
+    }
+
+    public JButton getPlayPauseMusicBtn() {
+        return playPauseMusicBtn;
+    }
+
+    public JButton getStopMusicBtn() {
+        return stopMusicBtn;
+    }
+
+    public JButton getRefreshMusicListBtn() {
+        return refreshMusicListBtn;
+    }
+
+    public JCheckBox getLoopCheckBox() {
+        return loopCheckBox;
+    }
+
+    public void isPause(boolean flag) {
+        this.isPause = flag;
     }
 }
