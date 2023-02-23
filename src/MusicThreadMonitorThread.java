@@ -11,16 +11,16 @@ public class MusicThreadMonitorThread extends Thread {
     private AudioStreamThread musicThread;
 
     // music control panel
-    private MusicControlPanelV2 musicControlPanelV2;
+    private MusicControlPanel musicControlPanel;
 
     /**
      * Constructor
      * @param musicThread - music thread
      * @param musicControlPanelV2 - music control panel
      */
-    public MusicThreadMonitorThread(AudioStreamThread musicThread, MusicControlPanelV2 musicControlPanelV2) {
+    public MusicThreadMonitorThread(AudioStreamThread musicThread, MusicControlPanel musicControlPanelV2) {
         this.musicThread = musicThread;
-        this.musicControlPanelV2 = musicControlPanelV2;
+        this.musicControlPanel = musicControlPanelV2;
     }
 
     @Override
@@ -33,13 +33,13 @@ public class MusicThreadMonitorThread extends Thread {
                     e.printStackTrace();
                 }
             }
-            this.musicControlPanelV2.isPause(false);
-            this.musicControlPanelV2.getRefreshMusicListBtn().setEnabled(true);
-            this.musicControlPanelV2.getMusicListComp().setEnabled(true);
-            this.musicControlPanelV2.getStopMusicBtn().setEnabled(false);
-            this.musicControlPanelV2.getPlayPauseMusicBtn().setText("Play");
-            this.musicControlPanelV2.getLoopCheckBox().setSelected(false);
-            this.musicControlPanelV2.getLoopCheckBox().setEnabled(false);
+            this.musicControlPanel.isPause(false);
+            this.musicControlPanel.getRefreshMusicListBtn().setEnabled(true);
+            this.musicControlPanel.getMusicListComp().setEnabled(true);
+            this.musicControlPanel.getStopMusicBtn().setEnabled(false);
+            this.musicControlPanel.getPlayPauseMusicBtn().setText("Play");
+            this.musicControlPanel.getLoopCheckBox().setSelected(false);
+            this.musicControlPanel.getLoopCheckBox().setEnabled(false);
         }
     }
 }

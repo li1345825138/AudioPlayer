@@ -10,14 +10,14 @@ import java.awt.Toolkit;
 public class AudioPlayerGUI extends JFrame {
 
     // Music Control Panel
-    private MusicControlPanelV2 musicControlPanelV2;
+    private MusicControlPanel musicControlPanel;
 
     /**
      * Set up Control Panel Object
      */
     private void setUpControlPanel() {
-        this.musicControlPanelV2 = new MusicControlPanelV2("songs/");
-        this.add(this.musicControlPanelV2);
+        this.musicControlPanel = new MusicControlPanel("songs/");
+        this.add(this.musicControlPanel);
     }
     /**
      * Constructor

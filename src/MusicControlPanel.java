@@ -1,28 +1,21 @@
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Music Control Panel
+ * Music Control Panel Version 2
+ * Update from original MusicControlPanel Class
+ *
  * @author li1345825138
- * @date 09/12/2022
+ * @date 11/24/2022
  */
-@Deprecated(since = "This is Old Music Control Panel, use MusicControlPanelV2 instead")
-public class MusicControlPanel extends JPanel implements ActionListener, KeyListener {
-
+public class MusicControlPanel extends JPanel implements ActionListener {
     // Default Module set up for JList
     private DefaultListModel<String> defaultModule;
 
@@ -47,20 +40,32 @@ public class MusicControlPanel extends JPanel implements ActionListener, KeyList
     // loop current playing music check box
     private JCheckBox loopCheckBox;
 
-    // music start playing thread
-    private Thread musicThread;
-
-    // music playing progress monitor thread
-    private Thread musicPlayingMonitor;
-
-    // music playing runnable class, use for musicThread
-    private PlayMusicRunable musicPlay;
-
     // music files locate root path
     private String musicPath;
 
-    // music pause time position record for music resume playing
-    private int musicPauseTimePosition = 0;
+    // music thread pool
+    private ThreadPoolExecutor musicThreadPool;
+
+    // music play thread
+    private AudioStreamThread musicThread;
+
+    // is current music thread pause
+    private volatile boolean isPause;
+
+    /**
+     * Music Control Panel Constructor
+     * @param musicsPath the root of music files locate path
+     */
+    public MusicControlPanel(String musicsPath) {
+        setLayout(null);
+        this.musicThreadPool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(1), Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.DiscardPolicy());
+        this.musicPath = musicsPath;
+        this.isPause = false;
+        setUpComponents();
+        this.musicThread = new AudioStreamThread();
+    }
 
     /**
      * Return all wav format music file
@@ -127,161 +132,87 @@ public class MusicControlPanel extends JPanel implements ActionListener, KeyList
         this.stopMusicBtn.setBounds(340, 90, 81, 31);
         this.add(this.stopMusicBtn);
 
-        this.loopCheckBox = new JCheckBox("Loop", false);
+        this.loopCheckBox = new JCheckBox("Repeat", false);
         this.loopCheckBox.setFocusable(false);
         this.loopCheckBox.setBounds(440, 90, 81, 21);
-        this.loopCheckBox.addActionListener((e) -> {
-            if (this.loopCheckBox.isSelected()){
-                setMusicPlayLoop(true);
-                return;
-            }
-            setMusicPlayLoop(false);
-        });
+        this.loopCheckBox.addActionListener(this);
         this.loopCheckBox.setEnabled(false);
         this.add(this.loopCheckBox);
 
-        this.addKeyListener(this);
+        // this.addKeyListener(this);
         this.setFocusable(true);
     }
 
-    /**
-     * Stop music when music play thread complete
-     * use by music monitor thread
-     */
-    private synchronized void stopPlayWhenFinished() {
-        while (this.musicPlay != null) {
-            if (this.musicPlay.getStatus() == PlayMusicRunable.MusicStatus.Stop) {
-                this.refreshMusicListBtn.setEnabled(true);
-                this.musicList.setEnabled(true);
-                this.musicPlay.setLoop(false);
-                this.musicPauseTimePosition = 0;
-                this.stopMusicBtn.setEnabled(false);
-                this.playPauseMusicBtn.setText("Play");
-                this.playPauseMusicBtn.setEnabled(true);
-                this.loopCheckBox.setEnabled(false);
-                this.loopCheckBox.setSelected(false);
-                this.musicPlay = null;
-                this.musicThread = null;
-                this.musicPlayingMonitor = null;
-                break;
-            }
-        }
-    }
-
-    /**
-     * Set music play in loop
-     * @param flag
-     */
-    private void setMusicPlayLoop(boolean flag) {
-        if (this.musicPlay == null) return;
-        this.musicPlay.setLoop(flag);
-    }
-
-    private void pauseMusic() {
-        if (this.musicPlay == null) return;
-        this.musicPlay.pauseMusic();
-    }
-
-    /**
-     * Music Control Panel Constructor
-     * @param musicsPath the root of music files locate path
-     */
-    public MusicControlPanel(String musicsPath) {
-        setLayout(null);
-        this.musicPath = musicsPath;
-        setUpComponents();
-    }
-
-    /**
-     * play or pause music
-     * @param command
-     */
-    private void playOrPauseMusic(String command) {
-        if (command.equals("Play")) {
-            if (this.selectMusicTitle.getText() == null || this.selectMusicTitle.getText().equals("") || this.selectMusicTitle.getText().equals("<== Select Music From Left Side First")) return;
-            if (this.musicPauseTimePosition > 0) {
-                this.musicPlay.resumeMusic(this.loopCheckBox.isSelected());
-                this.playPauseMusicBtn.setText("Pause");
-                this.loopCheckBox.setEnabled(true);
-                return;
-            }
-            this.playPauseMusicBtn.setText("Pause");
-            this.musicList.setEnabled(false);
-            this.refreshMusicListBtn.setEnabled(false);
-            this.stopMusicBtn.setEnabled(true);
-            this.musicPlay = new PlayMusicRunable(this.musicPath, this.selectMusicTitle.getText());
-            this.musicThread = new Thread(this.musicPlay);
-            this.musicThread.start();
-            this.musicPlayingMonitor = new Thread(this::stopPlayWhenFinished);
-            this.musicPlayingMonitor.start();
-            this.loopCheckBox.setEnabled(true);
-        } else if (command.equals("Pause")) {
-            this.musicPauseTimePosition = this.musicPlay.getMusicTimePosition();
-            pauseMusic();
-            this.loopCheckBox.setEnabled(false);
-            this.playPauseMusicBtn.setText("Play");
-        }
-    }
-
-    /**
-     * Process Button press command
-     * When Play Button been press, play music
-     * When Stop Button been press, stop playing music
-     * @param e the event to be processed
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("Play")) {
-            playOrPauseMusic("Play");
-        } else if (e.getActionCommand().equals("Pause")) {
-            playOrPauseMusic("Pause");
-        } else if (e.getSource() == this.stopMusicBtn) {
-            this.refreshMusicListBtn.setEnabled(true);
-            this.stopMusicBtn.setEnabled(false);
-            this.musicPlay.setStatus(PlayMusicRunable.MusicStatus.Stop);
-            this.musicList.setEnabled(true);
-        } else if (e.getSource() == this.refreshMusicListBtn) {
-            this.defaultModule.removeAllElements();
-            String[] musicListNames = getMusicList();
-            if (musicListNames == null || musicListNames.length == 0) {
-                JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
-            } else {
-                this.defaultModule.addAll(List.of(musicListNames));
+        switch (e.getActionCommand()) {
+            case "Play" -> {
+                if (this.selectMusicTitle.getText() == null || this.selectMusicTitle.getText().isEmpty() || this.selectMusicTitle.getText().equals("<== Select Music From Left Side First"))
+                    return;
+                if (this.isPause) {
+                    this.musicThread.setRepeat(this.loopCheckBox.isSelected());
+                    this.musicThreadPool.execute(this.musicThread);
+                    this.playPauseMusicBtn.setText("Pause");
+                    this.loopCheckBox.setEnabled(true);
+                    this.isPause = false;
+                    return;
+                }
+                this.playPauseMusicBtn.setText("Pause");
+                this.musicList.setEnabled(false);
+                this.refreshMusicListBtn.setEnabled(false);
+                this.stopMusicBtn.setEnabled(true);
+                this.musicThread.setMusicProperties(this.musicPath, this.selectMusicTitle.getText());
+                this.musicThreadPool.execute(this.musicThread);
+                while (!this.musicThread.isPlaying());
+                this.musicThreadPool.execute(new MusicThreadMonitorThread(this.musicThread, this));
+                this.loopCheckBox.setEnabled(true);
+            }
+            case "Pause" -> {
+                if (this.musicThread == null) return;
+                this.musicThread.pauseAudioStream();
+                this.loopCheckBox.setEnabled(false);
+                this.playPauseMusicBtn.setText("Play");
+                this.isPause = true;
+            }
+            case "Stop" -> {
+                this.musicThread.stopMusic();
+                this.isPause = false;
+            }
+            case "Repeat" -> this.musicThread.setRepeat(this.loopCheckBox.isSelected());
+            case "Refresh Music List" -> {
+                this.defaultModule.removeAllElements();
+                String[] musicListNames = getMusicList();
+                if (musicListNames == null || musicListNames.length == 0) {
+                    JOptionPane.showMessageDialog(this, "There is no wav music files on songs/ directory", "Warning", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    this.defaultModule.addAll(List.of(musicListNames));
+                }
+                this.selectMusicTitle.setText("<== Select Music From Left Side First");
             }
         }
     }
 
-    /**
-     * Not using method
-     * @param e the event to be processed
-     */
-    @Override
-    public void keyTyped(KeyEvent e) {
-
+    public JList<String> getMusicListComp() {
+        return this.musicList;
     }
 
-    /**
-     * Processing if pause music key is press
-     * @param e the event to be processed
-     */
-    @Override
-    public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_0, KeyEvent.VK_NUMPAD0 -> {
-                if (this.playPauseMusicBtn.getText().equals("Play"))
-                    playOrPauseMusic("Play");
-                else if (this.playPauseMusicBtn.getText().equals("Pause"))
-                    playOrPauseMusic("Pause");
-            }
-        }
+    public JButton getPlayPauseMusicBtn() {
+        return playPauseMusicBtn;
     }
 
-    /**
-     * Not using Method
-     * @param e the event to be processed
-     */
-    @Override
-    public void keyReleased(KeyEvent e) {
+    public JButton getStopMusicBtn() {
+        return stopMusicBtn;
+    }
 
+    public JButton getRefreshMusicListBtn() {
+        return refreshMusicListBtn;
+    }
+
+    public JCheckBox getLoopCheckBox() {
+        return loopCheckBox;
+    }
+
+    public void isPause(boolean flag) {
+        this.isPause = flag;
     }
 }
