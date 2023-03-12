@@ -1,15 +1,20 @@
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Music Control Panel Version 2
+ * Music Control Panel
  * Update from original MusicControlPanel Class
  *
  * @author li1345825138
@@ -43,11 +48,11 @@ public class MusicControlPanel extends JPanel implements ActionListener {
     // music files locate root path
     private String musicPath;
 
-    // music thread pool
-    private ThreadPoolExecutor musicThreadPool;
+    // music thread pool (replace with virtual thread)
+    // private ThreadPoolExecutor musicRunnablePool;
 
     // music play thread
-    private AudioStreamThread musicThread;
+    private AudioStreamRunnable musicRunnable;
 
     // is current music thread pause
     private volatile boolean isPause;
@@ -58,13 +63,14 @@ public class MusicControlPanel extends JPanel implements ActionListener {
      */
     public MusicControlPanel(String musicsPath) {
         setLayout(null);
-        this.musicThreadPool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+        // thread pool is replace by virtual thread
+        /* this.musicRunnablePool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(1), Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.DiscardPolicy());
+                new ThreadPoolExecutor.DiscardPolicy()); */
         this.musicPath = musicsPath;
         this.isPause = false;
         setUpComponents();
-        this.musicThread = new AudioStreamThread();
+        this.musicRunnable = new AudioStreamRunnable();
     }
 
     /**
@@ -150,8 +156,9 @@ public class MusicControlPanel extends JPanel implements ActionListener {
                 if (this.selectMusicTitle.getText() == null || this.selectMusicTitle.getText().isEmpty() || this.selectMusicTitle.getText().equals("<== Select Music From Left Side First"))
                     return;
                 if (this.isPause) {
-                    this.musicThread.setRepeat(this.loopCheckBox.isSelected());
-                    this.musicThreadPool.execute(this.musicThread);
+                    this.musicRunnable.setRepeat(this.loopCheckBox.isSelected());
+                    // this.musicRunnablePool.execute(this.musicRunnable);
+                    Thread.startVirtualThread(this.musicRunnable);
                     this.playPauseMusicBtn.setText("Pause");
                     this.loopCheckBox.setEnabled(true);
                     this.isPause = false;
@@ -161,24 +168,26 @@ public class MusicControlPanel extends JPanel implements ActionListener {
                 this.musicList.setEnabled(false);
                 this.refreshMusicListBtn.setEnabled(false);
                 this.stopMusicBtn.setEnabled(true);
-                this.musicThread.setMusicProperties(this.musicPath, this.selectMusicTitle.getText());
-                this.musicThreadPool.execute(this.musicThread);
-                while (!this.musicThread.isPlaying());
-                this.musicThreadPool.execute(new MusicThreadMonitorThread(this.musicThread, this));
+                this.musicRunnable.setMusicProperties(this.musicPath, this.selectMusicTitle.getText());
+                // this.musicRunnablePool.execute(this.musicRunnable);
+                Thread.startVirtualThread(this.musicRunnable);
+                while (!this.musicRunnable.isPlaying());
+                // this.musicRunnablePool.execute(new musicRunnableMonitorThread(this.musicRunnable, this));
+                Thread.startVirtualThread(new MusicThreadMonitorRunnable(this.musicRunnable, this));
                 this.loopCheckBox.setEnabled(true);
             }
             case "Pause" -> {
-                if (this.musicThread == null) return;
-                this.musicThread.pauseAudioStream();
+                if (this.musicRunnable == null) return;
+                this.musicRunnable.pauseAudioStream();
                 this.loopCheckBox.setEnabled(false);
                 this.playPauseMusicBtn.setText("Play");
                 this.isPause = true;
             }
             case "Stop" -> {
-                this.musicThread.stopMusic();
+                this.musicRunnable.stopMusic();
                 this.isPause = false;
             }
-            case "Repeat" -> this.musicThread.setRepeat(this.loopCheckBox.isSelected());
+            case "Repeat" -> this.musicRunnable.setRepeat(this.loopCheckBox.isSelected());
             case "Refresh Music List" -> {
                 this.defaultModule.removeAllElements();
                 String[] musicListNames = getMusicList();

@@ -5,10 +5,10 @@
  * @author li1345825138
  * @date 02/27/2023
  */
-public class MusicThreadMonitorThread extends Thread {
+public class MusicThreadMonitorRunnable implements Runnable {
 
     // music thread
-    private AudioStreamThread musicThread;
+    private AudioStreamRunnable musicThread;
 
     // music control panel
     private MusicControlPanel musicControlPanel;
@@ -18,7 +18,7 @@ public class MusicThreadMonitorThread extends Thread {
      * @param musicThread - music thread
      * @param musicControlPanelV2 - music control panel
      */
-    public MusicThreadMonitorThread(AudioStreamThread musicThread, MusicControlPanel musicControlPanelV2) {
+    public MusicThreadMonitorRunnable(AudioStreamRunnable musicThread, MusicControlPanel musicControlPanelV2) {
         this.musicThread = musicThread;
         this.musicControlPanel = musicControlPanelV2;
     }

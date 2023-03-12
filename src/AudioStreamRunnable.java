@@ -11,7 +11,7 @@ import java.io.IOException;
  * @author li1345825138
  * @date 11/24/2022
  */
-public class AudioStreamThread implements Runnable {
+public class AudioStreamRunnable implements Runnable {
 
     /**
      * Music Playing Status
@@ -35,7 +35,7 @@ public class AudioStreamThread implements Runnable {
      * This Constructor didn't set up anything
      * Set up the properties before run it
      */
-    public AudioStreamThread() {
+    public AudioStreamRunnable() {
         this.status = MusicStatus.Stop;
         this.musicFullPath = null;
         this.audioInputStream = null;
@@ -47,7 +47,7 @@ public class AudioStreamThread implements Runnable {
      * @param musicPath music files locate root path
      * @param musicName music file name
      */
-    public AudioStreamThread(String musicPath, String musicName){
+    public AudioStreamRunnable(String musicPath, String musicName){
         StringBuilder sb = new StringBuilder(musicPath);
         sb.append(musicName).append(".wav");
         this.musicFullPath = sb.toString();
