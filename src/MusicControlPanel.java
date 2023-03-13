@@ -2,8 +2,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -50,11 +52,8 @@ public class MusicControlPanel extends JPanel implements ActionListener {
     // music files locate root path
     private String musicPath;
 
-    // music thread pool (replace with virtual thread)
-    // private ThreadPoolExecutor musicRunnablePool;
-
-    // virtual music thread
-    private ExecutorService virtualThread;
+    // music thread pool
+    private ThreadPoolExecutor musicRunnablePool;
 
     // music play thread
     private AudioStreamRunnable musicRunnable;
@@ -68,11 +67,9 @@ public class MusicControlPanel extends JPanel implements ActionListener {
      */
     public MusicControlPanel(String musicsPath) {
         setLayout(null);
-        // thread pool is replace by virtual thread
-        /* this.musicRunnablePool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+        this.musicRunnablePool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(1), Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.DiscardPolicy()); */
-        this.virtualThread = Executors.newVirtualThreadPerTaskExecutor();
+                new ThreadPoolExecutor.DiscardPolicy());
         this.musicPath = musicsPath;
         this.isPause = false;
         setUpComponents();
@@ -163,8 +160,7 @@ public class MusicControlPanel extends JPanel implements ActionListener {
                     return;
                 if (this.isPause) {
                     this.musicRunnable.setRepeat(this.loopCheckBox.isSelected());
-                    // this.musicRunnablePool.execute(this.musicRunnable);
-                    this.virtualThread.execute(this.musicRunnable);
+                    this.musicRunnablePool.execute(this.musicRunnable);
                     this.playPauseMusicBtn.setText("Pause");
                     this.loopCheckBox.setEnabled(true);
                     this.isPause = false;
@@ -175,11 +171,9 @@ public class MusicControlPanel extends JPanel implements ActionListener {
                 this.refreshMusicListBtn.setEnabled(false);
                 this.stopMusicBtn.setEnabled(true);
                 this.musicRunnable.setMusicProperties(this.musicPath, this.selectMusicTitle.getText());
-                // this.musicRunnablePool.execute(this.musicRunnable);
-                this.virtualThread.execute(this.musicRunnable);
+                this.musicRunnablePool.execute(this.musicRunnable);
                 while (!this.musicRunnable.isPlaying());
-                // this.musicRunnablePool.execute(new MusicThreadMonitorRunnable(this.musicRunnable, this));
-                this.virtualThread.execute(new MusicThreadMonitorRunnable(this.musicRunnable, this));
+                this.musicRunnablePool.execute(new MusicThreadMonitorRunnable(this.musicRunnable, this));
                 this.loopCheckBox.setEnabled(true);
             }
             case "Pause" -> {

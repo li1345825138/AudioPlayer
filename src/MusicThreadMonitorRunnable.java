@@ -16,11 +16,11 @@ public class MusicThreadMonitorRunnable implements Runnable {
     /**
      * Constructor
      * @param musicThread - music thread
-     * @param musicControlPanelV2 - music control panel
+     * @param musicControlPanel - music control panel
      */
-    public MusicThreadMonitorRunnable(AudioStreamRunnable musicThread, MusicControlPanel musicControlPanelV2) {
+    public MusicThreadMonitorRunnable(AudioStreamRunnable musicThread, MusicControlPanel musicControlPanel) {
         this.musicThread = musicThread;
-        this.musicControlPanel = musicControlPanelV2;
+        this.musicControlPanel = musicControlPanel;
     }
 
     @Override
