@@ -33,7 +33,7 @@ public class MusicThreadMonitorRunnable implements Runnable {
                     e.printStackTrace();
                 }
             }
-            this.musicControlPanel.isPause(false);
+            this.musicControlPanel.setPauseFlag(false);
             this.musicControlPanel.getRefreshMusicListBtn().setEnabled(true);
             this.musicControlPanel.getMusicListComp().setEnabled(true);
             this.musicControlPanel.getStopMusicBtn().setEnabled(false);

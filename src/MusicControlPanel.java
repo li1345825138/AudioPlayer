@@ -221,7 +221,7 @@ public class MusicControlPanel extends JPanel implements ActionListener {
         return loopCheckBox;
     }
 
-    public void isPause(boolean flag) {
+    public void setPauseFlag(boolean flag) {
         this.isPause = flag;
     }
 }
