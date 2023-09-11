@@ -6,9 +6,7 @@ Java Audio Player(only wav format music file)
 Audio Player will read all wav format music files on songs directory
 
 PS: if didn't have songs directory program will auto create one. <br>
-PS: Because of use Virtual Thread, so it require with <font style="background: red">--enable-preview</font> option to run Jar file. <br>
-<br>
-Exmaple: Java -jar --enable-preview jar-filename.jar
+Usage: double-click on jar file.
 
 ## Functions
 ___

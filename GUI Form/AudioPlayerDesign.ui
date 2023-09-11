@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Java Audio Player</string>
   </property>
-  <widget class="QListView" name="listView">
+  <widget class="QListView" name="musicListBox">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -23,7 +23,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="musicTitle">
    <property name="geometry">
     <rect>
      <x>230</x>
@@ -39,7 +39,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="playButton">
    <property name="geometry">
     <rect>
      <x>250</x>
@@ -52,7 +52,7 @@
     <string>Play</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="stopButton">
    <property name="geometry">
     <rect>
      <x>340</x>
@@ -65,7 +65,7 @@
     <string>Stop</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
+  <widget class="QCheckBox" name="repeatCheckBox">
    <property name="geometry">
     <rect>
      <x>440</x>
@@ -75,10 +75,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Loop</string>
+    <string>Repeat</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_3">
+  <widget class="QPushButton" name="refreshButton">
    <property name="geometry">
     <rect>
      <x>250</x>

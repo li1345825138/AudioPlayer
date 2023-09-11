@@ -27,8 +27,8 @@ public class AudioPlayerGUI extends JFrame {
         setTitle("Java Audio Player");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(581, 330);
-        int positionX = (screenSize.width - getWidth()) / 2;
-        int positionY = (screenSize.height - getHeight()) / 2;
+        int positionX = (screenSize.width - getWidth()) >> 1;
+        int positionY = (screenSize.height - getHeight()) >> 1;
         setLocation(positionX, positionY);
         setResizable(false);
         setUpControlPanel();
