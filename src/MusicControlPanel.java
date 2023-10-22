@@ -1,11 +1,3 @@
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -16,6 +8,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Music Control Panel
@@ -67,8 +66,8 @@ public class MusicControlPanel extends JPanel implements ActionListener {
      */
     public MusicControlPanel(String musicsPath) {
         setLayout(null);
-        this.musicRunnablePool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(1), Executors.defaultThreadFactory(),
+        this.musicRunnablePool = new ThreadPoolExecutor(2, 2, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(2), Thread.ofVirtual().factory(),
                 new ThreadPoolExecutor.DiscardPolicy());
         this.musicPath = musicsPath;
         this.isPause = false;
