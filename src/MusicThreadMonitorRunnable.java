@@ -38,6 +38,7 @@ public class MusicThreadMonitorRunnable implements Runnable {
             this.musicControlPanel.getMusicListComp().setEnabled(true);
             this.musicControlPanel.getStopMusicBtn().setEnabled(false);
             this.musicControlPanel.getPlayPauseMusicBtn().setText("Play");
+            this.musicControlPanel.getPlayPauseMusicBtn().setEnabled(true);
             this.musicControlPanel.getLoopCheckBox().setSelected(false);
             this.musicControlPanel.getLoopCheckBox().setEnabled(false);
         }
